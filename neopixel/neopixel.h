@@ -11,7 +11,7 @@
 
 void initNeoPixel();
 uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b);
-void renderMatrix(bool letra[MATRIX_LEN][MATRIX_LEN]);
+void renderMatrix(bool letra[MATRIX_LEN][MATRIX_LEN], uint32_t color);
 void renderRGBMatrix(uint32_t matrix[MATRIX_LEN][MATRIX_LEN]);
 
 #define NEOPIXEL_PIN 7

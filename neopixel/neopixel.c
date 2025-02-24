@@ -19,12 +19,12 @@ void initNeoPixel() {
   ws2812_program_init(pio, sm, offset, NEOPIXEL_PIN, 800000, false);
 }
 
-void renderMatrix(bool letra[MATRIX_LEN][MATRIX_LEN]) {
+void renderMatrix(bool letra[MATRIX_LEN][MATRIX_LEN], uint32_t color) {
   for(int i = MATRIX_LEN - 1; i >= 0; i--){
     for(int j = MATRIX_LEN - 1; j >= 0; j--) {
       uint8_t col = j;
       if(i % 2 != 0) col = MATRIX_LEN - 1 - j;
-      if(letra[i][col]) put_pixel(urgb_u32(255, 0, 0));
+      if(letra[i][col]) put_pixel(color);
       else put_pixel(urgb_u32(0, 0, 0));
     }
   }

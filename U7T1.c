@@ -2,7 +2,7 @@
 
 struct repeating_timer timer;
 bool beep = false;
-char npx_char;
+bool replace_char = false;
 
 // Alarmes para controle de debounce dos botões
 static alarm_id_t btn_a_alm;
@@ -149,18 +149,31 @@ void update_display(){
 }
 
 bool repeat_callback(struct repeating_timer *t) {
-    if(alm_a == ALARM || alm_b == ALARM) {      
-        if(beep) {
-            pwm_set_gpio_level(BUZZER, 2000);
-        } else {
-            pwm_set_gpio_level(BUZZER, 0);
-        }
+    bool show_a = alm_a != NORMAL;
+    bool show_b = alm_b != NORMAL;
+    
+    if(show_a && (!show_b || replace_char)) {
+        uint32_t color = alm_a == ALARM ? urgb_u32(150, 0, 0) : urgb_u32(150,50,0);
+        renderMatrix(CHAR_A, color);
+    }
+    if(show_b && (!show_a || !replace_char)) {
+        uint32_t color = alm_b == ALARM ? urgb_u32(150, 0, 0) : urgb_u32(150,50,0);
+        renderMatrix(CHAR_B, color);
+    }
+    if(!show_a && !show_b) renderMatrix(OFF, 0);
+
+    if(alm_a == ALARM || alm_b == ALARM) {
+        uint16_t level = beep ? 2000 : 0;     
+        pwm_set_gpio_level(BUZZER, level);        
         beep = !beep;
     }
     else { 
         pwm_set_gpio_level(BUZZER, 0);
         beep = false;
     }
+    
+    replace_char = !replace_char;
+    return true;
 }
 
 int main()
