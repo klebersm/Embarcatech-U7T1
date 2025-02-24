@@ -106,17 +106,18 @@ static void debounce(uint gpio, uint32_t events) {
     }
 }
 
-void draw_tank(uint16_t left, uint16_t pct, uint16_t pct_alm) {
-    ssd1306_rect(&ssd, 0, left, 12, 62, true, false);
+void draw_tank(uint16_t top, uint16_t pct, uint16_t pct_alm) {
+    ssd1306_rect(&ssd, top, 1, 125, 18, true, false);
 
-    uint16_t top = 60 - 5.8f * pct / 10;
-    uint16_t width = 60 - top;
-    ssd1306_rect(&ssd, top, left + 2, 8, width, true, true);
+    uint16_t width = 123 * pct / 100;
+    ssd1306_rect(&ssd, top + 2, 3, width, 14, true, true);
 
-    uint16_t pos_alm = 60 - 5.8f * pct_alm / 10;
-    ssd1306_hline(&ssd, left - 2, left + 1, pos_alm, true);
-    ssd1306_hline(&ssd, left + 2, left + 9, pos_alm, pos_alm <= top);
-    ssd1306_hline(&ssd, left + 10, left + 13, pos_alm, true);
+    uint16_t pos_alm = 123 * pct_alm / 100;
+    ssd1306_vline(&ssd, pos_alm, top - 2, top + 1, true);
+    ssd1306_vline(&ssd, pos_alm, top + 2, top + 16, pos_alm >= width);
+    ssd1306_vline(&ssd, pos_alm, top + 16, top + 18, true);
+
+    // ssd1306_hline(&ssd, left + 10, left + 13, pos_alm, true);
 }
 
 void update_display(){
@@ -125,22 +126,24 @@ void update_display(){
     ssd1306_fill(&ssd, false);
     char value[5];
 
-    draw_tank(100, pct_a, pct_alm_a);
-    draw_tank(115, pct_b, pct_alm_b);
+    draw_tank(10, pct_a, pct_alm_a);
+    draw_tank(45, pct_b, pct_alm_b);
 
     sprintf(value, "%d", pct_a);
     ssd1306_draw_string(&ssd, "TQ A", 0, 0);
     ssd1306_draw_string(&ssd, value, 40, 0);
-    if(alm_a == NORMAL) ssd1306_draw_string(&ssd, "NRML", 60, 0);
-    if(alm_a == ALARM || alm_a == CLEARED) ssd1306_draw_string(&ssd, "ALM", 60, 10);
-    if(alm_a == CLEARED) ssd1306_hline(&ssd, 58, 85, 3, true);
+    ssd1306_draw_string(&ssd, "PCT", 60, 0);
+    if(alm_a == NORMAL) ssd1306_draw_string(&ssd, "NRML", 90, 0);
+    if(alm_a == ALARM || alm_a == CLEARED) ssd1306_draw_string(&ssd, "ALM", 90, 0);
+    if(alm_a == CLEARED) ssd1306_hline(&ssd, 88, 115, 3, true);
     
     sprintf(value, "%d", pct_b);
-    ssd1306_draw_string(&ssd, "TQ B", 0, 30);
-    ssd1306_draw_string(&ssd, value, 40, 30);
-    if(alm_b == NORMAL) ssd1306_draw_string(&ssd, "NRML", 60, 30);
-    if(alm_b == ALARM || alm_b == CLEARED) ssd1306_draw_string(&ssd, "ALM", 60, 30);
-    if(alm_b == CLEARED) ssd1306_hline(&ssd, 58, 85, 33, true);
+    ssd1306_draw_string(&ssd, "TQ B", 0, 35);
+    ssd1306_draw_string(&ssd, value, 40, 35);
+    ssd1306_draw_string(&ssd, "PCT", 60, 35);
+    if(alm_b == NORMAL) ssd1306_draw_string(&ssd, "NRML", 90, 35);
+    if(alm_b == ALARM || alm_b == CLEARED) ssd1306_draw_string(&ssd, "ALM", 90, 35);
+    if(alm_b == CLEARED) ssd1306_hline(&ssd, 88, 115, 38, true);
 
     ssd1306_send_data(&ssd); // Atualiza o display
 }
