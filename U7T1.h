@@ -6,7 +6,10 @@
 #include "hardware/pwm.h"
 #include "hardware/adc.h"
 #include "hardware/i2c.h"
+#include "pico/time.h"
+
 #include "display/ssd1306.h"
+#include "neopixel/neopixel.h"
 
 #define LED_R         13
 #define LED_G         11
@@ -20,6 +23,8 @@
 #define BUTTON_B      6
 
 #define DEBOUNCE_MS   75
+
+#define BUZZER        21
 
 void init_btns();
 void init_display();

@@ -1,5 +1,9 @@
 #include "U7T1.h"
 
+struct repeating_timer timer;
+bool beep = false;
+char npx_char;
+
 // Alarmes para controle de debounce dos botões
 static alarm_id_t btn_a_alm;
 static alarm_id_t btn_b_alm;
@@ -55,6 +59,24 @@ void init_joystick_adc() {
     adc_gpio_init(JOYSTICK_Y);
 }
 
+
+void initBuzzerPwm() {
+    // Seta o pino pra PWM e busca o slice correspondente
+    gpio_set_function(BUZZER, GPIO_FUNC_PWM);
+    uint slice_num = pwm_gpio_to_slice_num(BUZZER);
+  
+    // Habilita o slice para o buzzer
+    pwm_clear_irq(slice_num);
+    pwm_set_irq_enabled(slice_num, true);
+  
+    // Inicializa a configuração padrão e seta clock e divisor    
+    pwm_config config = pwm_get_default_config();
+    pwm_config_set_clkdiv(&config, 4.f);
+    // Inicializa o slice
+    pwm_init(slice_num, &config, true);
+  }
+  
+
 uint64_t handle_btn_a(alarm_id_t id, void *user_data) {
     if(alm_a == ALARM) alm_a = CLEARED;
     else pct_alm_a = pct_a;
@@ -101,11 +123,41 @@ void update_display(){
     
     // Limpa o display e renderiza o retangulo mais externo (borda fina)
     ssd1306_fill(&ssd, false);
+    char value[5];
 
     draw_tank(100, pct_a, pct_alm_a);
     draw_tank(115, pct_b, pct_alm_b);
 
+    sprintf(value, "%d", pct_a);
+    ssd1306_draw_string(&ssd, "TQ A", 0, 0);
+    ssd1306_draw_string(&ssd, value, 40, 0);
+    if(alm_a == NORMAL) ssd1306_draw_string(&ssd, "NRML", 60, 0);
+    if(alm_a == ALARM || alm_a == CLEARED) ssd1306_draw_string(&ssd, "ALM", 60, 10);
+    if(alm_a == CLEARED) ssd1306_hline(&ssd, 58, 85, 3, true);
+    
+    sprintf(value, "%d", pct_b);
+    ssd1306_draw_string(&ssd, "TQ B", 0, 30);
+    ssd1306_draw_string(&ssd, value, 40, 30);
+    if(alm_b == NORMAL) ssd1306_draw_string(&ssd, "NRML", 60, 30);
+    if(alm_b == ALARM || alm_b == CLEARED) ssd1306_draw_string(&ssd, "ALM", 60, 30);
+    if(alm_b == CLEARED) ssd1306_hline(&ssd, 58, 85, 33, true);
+
     ssd1306_send_data(&ssd); // Atualiza o display
+}
+
+bool repeat_callback(struct repeating_timer *t) {
+    if(alm_a == ALARM || alm_b == ALARM) {      
+        if(beep) {
+            pwm_set_gpio_level(BUZZER, 2000);
+        } else {
+            pwm_set_gpio_level(BUZZER, 0);
+        }
+        beep = !beep;
+    }
+    else { 
+        pwm_set_gpio_level(BUZZER, 0);
+        beep = false;
+    }
 }
 
 int main()
@@ -115,6 +167,13 @@ int main()
     init_btns();
     init_display();
     init_joystick_adc();
+    
+    initBuzzerPwm();
+    // Inicializa a matriz de leds
+    initNeoPixel();
+
+    // Inicia uma repetição a cada 1 segundo para gerenciar alarmes sonoros e visuais
+    add_repeating_timer_ms(500, repeat_callback, NULL, &timer);
 
     while (true) {
         // Lê os valores do joystick
