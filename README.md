@@ -1,5 +1,10 @@
 # Embarcatech-U7T1
 
+## links úteis:
+
+[Relatório](https://drive.google.com/file/d/1GtpYH8RU-0lxia5Zwx7Q-luvL2j1X5Uh/view?usp=sharing)
+[Video](https://drive.google.com/file/d/1UaTDoonUdeKe41Mfk1ap8MS4KUDjbxsi/view?usp=sharing)
+
 Este projeto tem o objetivo de monitorar o nível de dois tanques baseado em leitura de celulas de cargas, capazes de indicar o volume de material armazenado, independente do tipo de produto presente no tanque monitorado.
 
 Além de monitorar os níveis para exibição no display, o sistema conta com funcionalidade de alarmes, permitindo ao usuário indicar os níveis mínimos desejados para que o sistema emita alarmes caso os níveis fiquem abaixo dos valores configurados.
