@@ -55,6 +55,8 @@ Os botões A e B foram inicializados como entradas em PULL UP e são monitorados
 
 ## 🔗 Link do Vídeo de Funcionamento:
 
+[Video](https://drive.google.com/file/d/1UaTDoonUdeKe41Mfk1ap8MS4KUDjbxsi/view?usp=sharing)
+
 ## 📞 Contato
 
 - 👤 **Autor**: Kleber Marçal
